@@ -9,14 +9,17 @@
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb small">
       <li class="breadcrumb-item"><a href="{% url 'loja:home' %}">Início</a></li>
-      <li class="breadcrumb-item active">{{ produto.nome }}</li>
+      <li class="breadcrumb-item"><a href="{% url 'loja:home' %}#catalogo">Catálogo</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ produto.nome }}</li>
     </ol>
   </nav>
 
   <div class="row g-5">
     <div class="col-12 col-lg-6">
       {% if produto.imagem_principal %}
-        <img src="{{ produto.imagem_principal.imagem.url }}" class="img-fluid rounded-4 mb-3" alt="{{ produto.nome }}">
+        <img src="{{ produto.imagem_principal.imagem.url }}" class="img-fluid w-100 rounded-4 mb-3" alt="{{ produto.nome }}">
+      {% else %}
+        <div class="rounded-4 bg-light d-flex align-items-center justify-content-center text-secondary" style="min-height: 300px;">Imagem em breve</div>
       {% endif %}
       <div class="row g-2">
         {% for img in produto.imagens.all %}
@@ -29,22 +32,12 @@
     <div class="col-12 col-lg-6">
       <span class="badge text-bg-light border">{{ produto.categoria.nome }}</span>
       <h1 class="h2 mt-2">{{ produto.nome }}</h1>
-      <p class="text-secondary">{{ produto.descricao_curta }}</p>
+      {% if produto.descricao_curta %}<p class="text-secondary">{{ produto.descricao_curta }}</p>{% endif %}
 
-      {% if variacoes %}
-        <h2 class="h6 mt-4">Variações</h2>
-        <ul class="list-group mb-3">
-          {% for v in variacoes %}
-            <li class="list-group-item d-flex justify-content-between">
-              <span>{{ v.nome }}{% if v.peso_kg %} <small class="text-secondary">({{ v.peso_kg }} kg)</small>{% endif %}</span>
-              <strong class="hd-preco">R$ {{ v.preco|floatformat:2|intcomma }}</strong>
-            </li>
-          {% endfor %}
-        </ul>
-      {% elif produto.preco %}
+      {% if produto.preco > 0 %}
         <p class="fs-3 hd-preco">R$ {{ produto.preco|floatformat:2|intcomma }}</p>
       {% else %}
-        <p class="text-secondary">Consulte o valor.</p>
+        <p class="text-secondary">Consulte o valor e a disponibilidade.</p>
       {% endif %}
 
       {% if produto.descricao %}
