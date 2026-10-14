@@ -14,10 +14,17 @@ from loja.views_clientes import (
     dashboard, cliente_lista, cliente_novo, cliente_editar, cliente_detalhe,
     cliente_alternar_status, endereco_novo, endereco_editar, endereco_excluir,
 )
+from loja.views_publica import home_publica, produto_publico
 
 app_name = "loja"
 
 urlpatterns = [
+
+    # Loja pública
+    path("", home_publica, name="home"),
+    path("catalogo/<slug:slug>/", produto_publico, name="produto_publico"),
+
+
     path("", dashboard, name="home"),
     path("dashboard/", dashboard, name="dashboard"),
     path("logout/", auth_views.LogoutView.as_view(next_page="loja:home"), name="logout"),

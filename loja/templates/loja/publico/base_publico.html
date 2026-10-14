@@ -15,11 +15,7 @@
       <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
         <li class="nav-item"><a class="nav-link" href="{% url 'loja:home' %}#destaques">Destaques</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'loja:home' %}#catalogo">Catálogo</a></li>
-        <li class="nav-item">
-          <a class="btn btn-hd btn-sm px-3" href="{% if user.is_authenticated %}{% url 'loja:dashboard' %}{% else %}{% url 'loja:login' %}{% endif %}">
-            {% if user.is_authenticated %}Painel{% else %}Entrar{% endif %}
-          </a>
-        </li>
+        <li class="nav-item"><a class="btn btn-hd btn-sm px-3" href="{% url 'loja:home' %}#catalogo">Ver produtos</a></li>
       </ul>
     </div>
   </div>
