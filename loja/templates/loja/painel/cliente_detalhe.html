@@ -5,10 +5,16 @@
 
 {% block conteudo %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h4 mb-0">{{ cliente.nome }}</h1>
+  <div>
+    <h1 class="h4 mb-1">{{ cliente.nome }}</h1>
+    {% if cliente.ativo %}<span class="badge text-bg-success">Ativo</span>{% else %}<span class="badge text-bg-secondary">Inativo</span>{% endif %}
+  </div>
   <div class="d-flex gap-2">
     <a class="btn btn-hd-outline" href="{% url 'loja:cliente_lista' %}">Voltar</a>
     <a class="btn btn-hd" href="{% url 'loja:cliente_editar' cliente.pk %}">Editar</a>
+    <form method="post" action="{% url 'loja:cliente_alternar_status' cliente.pk %}">{% csrf_token %}
+      {% if cliente.ativo %}<button class="btn btn-outline-warning">Desativar</button>{% else %}<button class="btn btn-outline-success">Reativar</button>{% endif %}
+    </form>
   </div>
 </div>
 
@@ -23,7 +29,7 @@
         <p class="mb-1 small">Propaganda: {% if cliente.aceita_receber_propaganda %}aceita{% else %}não aceita{% endif %}</p>
         <p class="mb-1 small text-secondary">Criado em {{ cliente.criado_em|date:"d/m/Y H:i" }}</p>
         <hr>
-        <p class="mb-0 small">Pedidos: <strong>{{ cliente.total_pedidos }}</strong> · Total: <strong>R$ {{ cliente.valor_total_pedidos|floatformat:2|intcomma }}</strong></p>
+        <p class="mb-0 small">Pedidos: <strong>{{ total_pedidos }}</strong> · Total: <strong>R$ {{ valor_total_pedidos|floatformat:2|intcomma }}</strong></p>
       </div>
     </div>
   </div>
@@ -42,7 +48,7 @@
               <span class="d-flex gap-1">
                 <a class="btn btn-sm btn-hd-outline" href="{% url 'loja:endereco_editar' e.pk %}">Editar</a>
                 <form method="post" action="{% url 'loja:endereco_excluir' e.pk %}" onsubmit="return confirm('Excluir este endereço?')">{% csrf_token %}
-                  <button class="btn btn-sm btn-outline-danger">Excluir</button>
+                  <button class="btn btn-sm btn-outline-danger" type="submit">Excluir</button>
                 </form>
               </span>
             </li>
