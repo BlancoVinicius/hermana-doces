@@ -1,0 +1,397 @@
+{% extends "loja/painel/base_painel.html" %}
+{% comment %} {% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}{{ produto.nome }}{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">{{ produto.nome }}</h1>
+  <div class="d-flex gap-2">
+    <a class="btn btn-hd-outline" href="{% url 'loja:produto_lista' %}">Voltar</a>
+    {% if produto.ativo %}<a class="btn btn-hd-outline" target="_blank" href="{{ produto.get_absolute_url }}">Ver no site</a>{% endif %}
+  </div>
+</div>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-dados" type="button">Dados</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-imagens" type="button">Imagens ({{ imagens|length }})</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-variacoes" type="button">Variações ({{ variacoes|length }})</button></li>
+  <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-componentes" type="button">Componentes ({{ componentes|length }})</button></li>
+</ul>
+
+<div class="tab-content">
+  <!-- Dados -->
+  <div class="tab-pane fade show active" id="tab-dados">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "loja/painel/_campos_form.html" with form=form %}
+          <button class="btn btn-hd mt-3">Salvar dados</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Imagens -->
+  <div class="tab-pane fade" id="tab-imagens">
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body">
+        <form method="post" action="{% url 'loja:imagem_adicionar' produto.pk %}" enctype="multipart/form-data" class="row g-2 align-items-end">
+          {% csrf_token %}
+          <div class="col-12 col-md-5"><label class="form-label">Arquivo</label>{{ form_imagem.imagem }}</div>
+          <div class="col-6 col-md-2"><label class="form-label">Ordem</label>{{ form_imagem.ordem }}</div>
+          <div class="col-6 col-md-3 form-check ms-2">{{ form_imagem.principal }}<label class="form-check-label">Principal</label></div>
+          <div class="col-12 col-md-1"><button class="btn btn-hd w-100">Adicionar</button></div>
+        </form>
+      </div>
+    </div>
+    <div class="row g-3">
+      {% for img in imagens %}
+        <div class="col-6 col-md-3">
+          <div class="hd-card p-2">
+            <img src="{{ img.imagem.url }}" class="hd-card-img rounded-3" alt="{{ produto.nome }}">
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <span class="small text-secondary">Ordem {{ img.ordem }}{% if img.principal %} · principal{% endif %}</span>
+            </div>
+            <div class="d-flex gap-1 mt-2">
+              {% if not img.principal %}
+                <form method="post" action="{% url 'loja:imagem_principal' img.pk %}">{% csrf_token %}<button class="btn btn-sm btn-hd-outline">Principal</button></form>
+              {% endif %}
+              <form method="post" action="{% url 'loja:imagem_excluir' img.pk %}" onsubmit="return confirm('Excluir esta imagem?')">{% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">Excluir</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-secondary">Nenhuma imagem cadastrada.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Variações -->
+  <div class="tab-pane fade" id="tab-variacoes">
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body">
+        <form method="post" action="{% url 'loja:variacao_salvar' produto.pk %}" class="row g-2 align-items-end">
+          {% csrf_token %}
+          <div class="col-12 col-md-4"><label class="form-label">Nome</label>{{ form_variacao.nome }}</div>
+          <div class="col-6 col-md-2"><label class="form-label">Preço</label>{{ form_variacao.preco }}</div>
+          <div class="col-6 col-md-2"><label class="form-label">Peso (kg)</label>{{ form_variacao.peso_kg }}</div>
+          <div class="col-6 col-md-1"><label class="form-label">Ordem</label>{{ form_variacao.ordem }}</div>
+          <div class="col-6 col-md-1 form-check ms-2">{{ form_variacao.ativa }}<label class="form-check-label">Ativa</label></div>
+          <div class="col-12 col-md-2"><button class="btn btn-hd w-100">Adicionar</button></div>
+        </form>
+      </div>
+    </div>
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Nome</th><th class="text-end">Preço</th><th>Peso</th><th>Ordem</th><th>Status</th><th class="text-end">Ações</th></tr></thead>
+          <tbody>
+            {% for v in variacoes %}
+              <tr>
+                <form method="post" action="{% url 'loja:variacao_salvar' produto.pk %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="variacao_id" value="{{ v.pk }}">
+                  <td><input class="form-control form-control-sm" name="nome" value="{{ v.nome }}"></td>
+                  <td><input class="form-control form-control-sm text-end" name="preco" value="{{ v.preco }}"></td>
+                  <td><input class="form-control form-control-sm" name="peso_kg" value="{{ v.peso_kg|default_if_none:'' }}"></td>
+                  <td><input class="form-control form-control-sm" name="ordem" value="{{ v.ordem }}" style="width:5rem"></td>
+                  <td><input type="checkbox" class="form-check-input" name="ativa" {% if v.ativa %}checked{% endif %}></td>
+                  <td class="text-end"><button class="btn btn-sm btn-hd">Salvar</button></td>
+                </form>
+                <td class="text-end ps-0">
+                  <form method="post" action="{% url 'loja:variacao_excluir' v.pk %}" onsubmit="return confirm('Excluir esta variação?')">{% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger">Excluir</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="7" class="text-secondary">Produto sem variações.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componentes -->
+  <div class="tab-pane fade" id="tab-componentes">
+    <div class="card border-0 shadow-sm rounded-4 mb-3">
+      <div class="card-body">
+        <p class="small text-secondary">Um produto pode ser composto por outros produtos (receitas, cestas, kits).</p>
+        <form method="post" action="{% url 'loja:componente_salvar' produto.pk %}" class="row g-2 align-items-end">
+          {% csrf_token %}
+          <div class="col-12 col-md-4"><label class="form-label">Componente</label>{{ form_componente.componente }}</div>
+          <div class="col-6 col-md-2"><label class="form-label">Quantidade</label>{{ form_componente.quantidade }}</div>
+          <div class="col-6 col-md-2"><label class="form-label">Unidade</label>{{ form_componente.unidade_medida }}</div>
+          <div class="col-6 col-md-2"><label class="form-label">Custo unit.</label>{{ form_componente.custo_unitario }}</div>
+          <div class="col-6 col-md-2"><button class="btn btn-hd w-100">Adicionar</button></div>
+        </form>
+      </div>
+    </div>
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Componente</th><th>Quantidade</th><th>Unidade</th><th class="text-end">Custo unit.</th><th class="text-end">Ações</th></tr></thead>
+          <tbody>
+            {% for c in componentes %}
+              <tr>
+                <form method="post" action="{% url 'loja:componente_salvar' produto.pk %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="componente_id" value="{{ c.pk }}">
+                  <input type="hidden" name="componente" value="{{ c.componente_id }}">
+                  <input type="hidden" name="ordem" value="{{ c.ordem }}">
+                  <td><a href="{% url 'loja:produto_editar' c.componente_id %}">{{ c.componente.nome }}</a></td>
+                  <td><input class="form-control form-control-sm" name="quantidade" value="{{ c.quantidade }}" style="width:7rem"></td>
+                  <td>
+                    <select class="form-select form-select-sm" name="unidade_medida" style="width:8rem">
+                      {% for valor, rotulo in c.UNIDADES %}
+                        <option value="{{ valor }}" {% if valor == c.unidade_medida %}selected{% endif %}>{{ rotulo }}</option>
+                      {% endfor %}
+                    </select>
+                  </td>
+                  <td class="text-end"><input class="form-control form-control-sm text-end" name="custo_unitario" value="{{ c.custo_unitario|default_if_none:'' }}" style="width:7rem"></td>
+                  <td class="text-end"><button class="btn btn-sm btn-hd">Salvar</button></td>
+                </form>
+                <td class="text-end ps-0">
+                  <form method="post" action="{% url 'loja:componente_excluir' c.pk %}" onsubmit="return confirm('Remover este componente?')">{% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger">Remover</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-secondary">Produto sem componentes.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if componentes %}
+          <p class="small text-secondary mb-0">Custo estimado dos componentes: R$ {{ produto.custo_componentes|floatformat:2|intcomma }}</p>
+        {% endif %}
+        {% if usos %}
+          <hr>
+          <p class="small mb-1">Este produto é componente de:</p>
+          <ul class="small mb-0">
+            {% for u in usos %}<li><a href="{% url 'loja:produto_editar' u.produto_id %}">{{ u.produto.nome }}</a></li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+ {% endcomment %}
+
+
+
+
+
+{% block titulo_pagina %}{{ titulo }}{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">{{ titulo }}</h1>
+  <a class="btn btn-hd-outline" href="{% url 'loja:produto_lista' %}">
+    Voltar
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="row g-3">
+        {% for field in form %}
+          {% if field.name == "destaque" or field.name == "ativo" %}
+            <div class="col-12 col-md-6">
+              <div class="form-check">
+                {{ field }}
+                <label class="form-check-label" for="{{ field.id_for_label }}">
+                  {{ field.label }}
+                </label>
+              </div>
+              {% for error in field.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="col-12 {% if field.name == 'descricao' %}col-md-12{% else %}col-md-6{% endif %}">
+              <label class="form-label" for="{{ field.id_for_label }}">
+                {{ field.label }}
+              </label>
+              {{ field }}
+
+              {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+              {% endif %}
+
+              {% for error in field.errors %}
+                <div class="text-danger small">{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <button type="submit" class="btn btn-hd">
+          Salvar produto
+        </button>
+        <a href="{% url 'loja:produto_lista' %}"
+           class="btn btn-hd-outline">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if produto %}
+  <div class="card border-0 shadow-sm rounded-4 mt-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Imagens do produto</h2>
+      <form method="post" action="{% url 'loja:imagem_adicionar' produto.pk %}" enctype="multipart/form-data" class="row g-3 align-items-end">
+        {% csrf_token %}
+        <div class="col-12 col-md-6">
+          <label class="form-label" for="{{ form_imagem.imagem.id_for_label }}">Arquivo da imagem</label>
+          {{ form_imagem.imagem }}
+          {% for error in form_imagem.imagem.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label" for="{{ form_imagem.ordem.id_for_label }}">Ordem</label>
+          {{ form_imagem.ordem }}
+        </div>
+        <div class="col-6 col-md-2">
+          <div class="form-check mb-2">{{ form_imagem.principal }} <label class="form-check-label" for="{{ form_imagem.principal.id_for_label }}">Principal</label></div>
+        </div>
+        <div class="col-12 col-md-2"><button type="submit" class="btn btn-hd w-100">Adicionar imagem</button></div>
+      </form>
+
+      <div class="row g-3 mt-2">
+        {% for img in imagens %}
+          <div class="col-6 col-md-3 col-lg-2">
+            <div class="border rounded-3 p-2 h-100">
+              <img src="{{ img.imagem.url }}" alt="{{ produto.nome }}" class="img-fluid rounded-2" style="width:100%;height:140px;object-fit:cover;">
+              <div class="small text-secondary mt-2">Ordem {{ img.ordem }}{% if img.principal %} · principal{% endif %}</div>
+              <div class="d-flex flex-wrap gap-1 mt-2">
+                {% if not img.principal %}
+                  <form method="post" action="{% url 'loja:imagem_principal' img.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-hd-outline">Definir principal</button></form>
+                {% endif %}
+                <form method="post" action="{% url 'loja:imagem_excluir' img.pk %}" onsubmit="return confirm('Excluir esta imagem?')">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button></form>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-secondary mb-0">Nenhuma imagem cadastrada.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  {% if eh_doce %}
+  <div class="card border-0 shadow-sm rounded-4 mt-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Ficha técnica — insumos do doce</h2>
+      <form method="post" action="{% url 'loja:doce_insumo_adicionar' produto.pk %}" class="row g-3 align-items-end">
+        {% csrf_token %}
+        <div class="col-12 col-md-7">
+          <label class="form-label" for="{{ form_doce_insumo.insumo.id_for_label }}">Insumo</label>
+          {{ form_doce_insumo.insumo }}
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label" for="{{ form_doce_insumo.quantidade.id_for_label }}">Quantidade</label>
+          {{ form_doce_insumo.quantidade }}
+        </div>
+        <div class="col-12 col-md-2">
+          <button type="submit" class="btn btn-hd w-100">Adicionar</button>
+        </div>
+      </form>
+
+      <div class="table-responsive mt-4">
+        <table class="table align-middle">
+          <thead><tr><th>Insumo</th><th>Unidade</th><th class="text-end">Quantidade</th><th class="text-end">Custo</th><th></th></tr></thead>
+          <tbody>
+            {% for ingrediente in ingredientes %}
+              <tr>
+                <td>{{ ingrediente.insumo.nome }}</td>
+                <td>{{ ingrediente.insumo.get_unidade_medida_display }}</td>
+                <td class="text-end">{{ ingrediente.quantidade }}</td>
+                <td class="text-end">R$ {{ ingrediente.custo_item|floatformat:2 }}</td>
+                <td class="text-end">
+                  <form method="post" action="{% url 'loja:doce_insumo_remover' ingrediente.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-secondary">Nenhum insumo adicionado.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="mb-0"><strong>Custo total dos insumos:</strong> R$ {{ produto.custo_producao_total|floatformat:2 }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if eh_kit %}
+  <div class="card border-0 shadow-sm rounded-4 mt-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Composição do kit</h2>
+      <form method="post" action="{% url 'loja:item_kit_adicionar' produto.pk %}" class="row g-3 align-items-end">
+        {% csrf_token %}
+        <div class="col-12 col-md-7">
+          <label class="form-label" for="{{ form_item_kit.produto.id_for_label }}">Produto</label>
+          {{ form_item_kit.produto }}
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label" for="{{ form_item_kit.quantidade.id_for_label }}">Quantidade</label>
+          {{ form_item_kit.quantidade }}
+        </div>
+        <div class="col-12 col-md-2">
+          <button type="submit" class="btn btn-hd w-100">Adicionar</button>
+        </div>
+      </form>
+
+      <div class="table-responsive mt-4">
+        <table class="table align-middle">
+          <thead><tr><th>Produto</th><th class="text-end">Quantidade</th><th class="text-end">Preço unitário</th><th class="text-end">Subtotal</th><th></th></tr></thead>
+          <tbody>
+            {% for item in itens_kit %}
+              <tr>
+                <td>{{ item.produto.nome }}</td>
+                <td class="text-end">{{ item.quantidade }}</td>
+                <td class="text-end">R$ {{ item.produto.preco|floatformat:2 }}</td>
+                <td class="text-end">R$ {{ item.custo_item|floatformat:2 }}</td>
+                <td class="text-end">
+                  <form method="post" action="{% url 'loja:item_kit_remover' item.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="5" class="text-secondary">Nenhum produto adicionado ao kit.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="mb-0"><strong>Custo total da composição:</strong> R$ {{ produto.custo_producao_total|floatformat:2 }}</p>
+      <p class="form-text mt-2">O modelo atual calcula esse valor usando o preço de venda dos produtos que compõem o kit.</p>
+    </div>
+  </div>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

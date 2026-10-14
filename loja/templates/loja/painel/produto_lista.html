@@ -1,0 +1,62 @@
+{% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}Produtos{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">Produtos</h1>
+  <a class="btn btn-hd" href="{% url 'loja:produto_novo' %}">Novo produto</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-12 col-md-4"><input class="form-control" type="search" name="q" value="{{ busca }}" placeholder="Buscar produto"></div>
+  <div class="col-6 col-md-3">
+    <select class="form-select" name="categoria">
+      <option value="">Todas as categorias</option>
+      {% for c in categorias %}<option value="{{ c.pk }}" {% if c.pk|stringformat:'s' == categoria_sel %}selected{% endif %}>{{ c.nome }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-6 col-md-3">
+    <select class="form-select" name="status">
+      <option value="">Todos</option>
+      <option value="ativos" {% if status == 'ativos' %}selected{% endif %}>Somente ativos</option>
+      <option value="inativos" {% if status == 'inativos' %}selected{% endif %}>Somente inativos</option>
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-hd-outline">Filtrar</button></div>
+</form>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th></th><th>Nome</th><th>Categoria</th><th class="text-end">Preço</th><th>Status</th><th class="text-end">Ações</th></tr></thead>
+      <tbody>
+        {% for p in pagina %}
+          <tr>
+            <td style="width:64px">
+              {% if p.imagem_principal %}<img src="{{ p.imagem_principal.imagem.url }}" alt="{{ p.nome }}" class="rounded" style="width:48px;height:48px;object-fit:cover">{% endif %}
+            </td>
+            <td>{{ p.nome }} {% if p.destaque %}<span class="badge hd-badge-destaque">Destaque</span>{% endif %}</td>
+            <td>{{ p.categoria.nome }}</td>
+            <td class="text-end">{% if p.preco_minimo %}R$ {{ p.preco_minimo|floatformat:2|intcomma }}{% else %}—{% endif %}</td>
+            <td>{% if p.ativo %}<span class="badge text-bg-success">Ativo</span>{% else %}<span class="badge text-bg-secondary">Inativo</span>{% endif %}</td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <a class="btn btn-sm btn-hd-outline" href="{% url 'loja:produto_editar' p.pk %}">Editar</a>
+                <form method="post" action="{% url 'loja:produto_toggle' p.pk %}">{% csrf_token %}
+                  <button class="btn btn-sm btn-hd-outline">{% if p.ativo %}Desativar{% else %}Ativar{% endif %}</button>
+                </form>
+                <a class="btn btn-sm btn-outline-danger" href="{% url 'loja:produto_excluir' p.pk %}">Excluir</a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-secondary">Nenhum produto cadastrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "loja/painel/_paginacao.html" %}
+  </div>
+</div>
+{% endblock %}

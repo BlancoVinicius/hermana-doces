@@ -1,0 +1,49 @@
+{% extends "loja/publico/base_publico.html" %}
+{% load humanize %}
+
+{% block titulo %}Hermana Doces — bolos, doces e cestas artesanais{% endblock %}
+
+{% block conteudo %}
+<section class="hd-hero py-5">
+  <div class="container text-center">
+    <h1 class="display-5 mb-3">Doces feitos com carinho</h1>
+    <p class="lead mb-4 text-secondary">Bolos, docinhos, cestas e kits para adoçar seus momentos.</p>
+    <form class="row justify-content-center g-2" method="get" action="{% url 'loja:home' %}#catalogo">
+      <div class="col-12 col-md-5">
+        <input type="search" name="q" value="{{ busca }}" class="form-control" placeholder="Buscar um doce...">
+      </div>
+      <div class="col-8 col-md-3">
+        <select name="categoria" class="form-select">
+          <option value="">Todas as categorias</option>
+          {% for c in categorias %}
+            <option value="{{ c.slug }}" {% if c.slug == categoria_slug %}selected{% endif %}>{{ c.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-4 col-md-auto"><button class="btn btn-hd w-100">Buscar</button></div>
+    </form>
+  </div>
+</section>
+
+{% if destaques %}
+<section id="destaques" class="container py-5">
+  <h2 class="h3 mb-4">Destaques</h2>
+  <div class="row g-4">
+    {% for produto in destaques %}
+      <div class="col-12 col-sm-6 col-lg-4">{% include "loja/publico/_card_produto.html" %}</div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section id="catalogo" class="container pb-5">
+  <h2 class="h3 mb-4">Catálogo</h2>
+  <div class="row g-4">
+    {% for produto in produtos %}
+      <div class="col-12 col-sm-6 col-lg-3">{% include "loja/publico/_card_produto.html" %}</div>
+    {% empty %}
+      <p class="text-secondary">Nenhum produto disponível no momento.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

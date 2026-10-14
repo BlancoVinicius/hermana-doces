@@ -1,0 +1,31 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block titulo %}Entrar — Hermana Doces{% endblock %}
+
+{% block corpo %}
+<div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+  <div class="card border-0 shadow-sm rounded-4 p-4" style="max-width: 24rem; width: 100%;">
+    <div class="text-center mb-3">
+      <img src="{% static 'img/hermana-logo.png' %}" alt="Hermana Doces" style="height:90px">
+      <h1 class="h5 mt-2">Área administrativa</h1>
+    </div>
+    {% if form.errors %}
+      <div class="alert alert-danger py-2 small">Usuário ou senha inválidos.</div>
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label" for="id_username">Usuário</label>
+        <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="id_password">Senha</label>
+        <input type="password" name="password" id="id_password" class="form-control" required>
+      </div>
+      <button class="btn btn-hd w-100">Entrar</button>
+    </form>
+    <a class="text-center small mt-3" href="{% url 'loja:home' %}">Voltar ao site</a>
+  </div>
+</div>
+{% endblock %}

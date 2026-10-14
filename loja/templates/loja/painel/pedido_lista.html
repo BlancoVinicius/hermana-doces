@@ -1,0 +1,23 @@
+{% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}Pedidos{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h1 class="h4 mb-0">Pedidos</h1>
+  <a class="btn btn-hd" href="{% url 'loja:pedido_novo' %}">Novo pedido</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-12 col-md-4"><input class="form-control" type="search" name="q" value="{{ busca }}" placeholder="Buscar por cliente ou código"></div>
+  <div class="col-8 col-md-3"><select class="form-select" name="status"><option value="">Todos os status</option>{% for valor, rotulo in status_opcoes %}<option value="{{ valor }}" {% if valor == status %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></div>
+  <div class="col-auto"><button class="btn btn-hd-outline">Filtrar</button></div>
+</form>
+<div class="card border-0 shadow-sm rounded-4"><div class="card-body table-responsive">
+<table class="table align-middle"><thead><tr><th>Código</th><th>Cliente</th><th>Status</th><th class="text-end">Total</th><th>Data</th><th></th></tr></thead><tbody>
+{% for p in pagina %}<tr><td>{{ p.numero }}</td><td>{{ p.cliente.nome }}</td><td><span class="badge text-bg-light border">{{ p.get_status_display }}</span></td><td class="text-end">R$ {{ p.total|floatformat:2|intcomma }}</td><td class="small text-secondary">{{ p.criado_em|date:"d/m/Y H:i" }}</td><td class="text-end"><a class="btn btn-sm btn-hd-outline" href="{% url 'loja:pedido_detalhe' p.pk %}">Abrir</a></td></tr>
+{% empty %}<tr><td colspan="6" class="text-secondary">Nenhum pedido encontrado.</td></tr>{% endfor %}
+</tbody></table>
+{% include "loja/painel/_paginacao.html" %}
+</div></div>
+{% endblock %}

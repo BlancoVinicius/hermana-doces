@@ -1,0 +1,43 @@
+{% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}Dashboard{% endblock %}
+
+{% block conteudo %}
+<h1 class="h4 mb-4">Dashboard</h1>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="hd-stat"><div class="small text-secondary">Produtos ativos</div><div class="valor">{{ produtos_ativos }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="hd-stat"><div class="small text-secondary">Clientes</div><div class="valor">{{ total_clientes }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="hd-stat"><div class="small text-secondary">Pedidos pendentes</div><div class="valor">{{ pedidos_pendentes }}</div></div></div>
+  <div class="col-6 col-lg-3"><div class="hd-stat"><div class="small text-secondary">Valor total em pedidos</div><div class="valor">R$ {{ valor_total|floatformat:2|intcomma }}</div></div></div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h6 mb-0">Pedidos recentes</h2>
+      <a class="btn btn-sm btn-hd" href="{% url 'loja:pedido_novo' %}">Novo pedido</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead><tr><th>Nº</th><th>Cliente</th><th>Status</th><th class="text-end">Total</th><th>Data</th></tr></thead>
+        <tbody>
+          {% for p in pedidos_recentes %}
+            <tr>
+              <td><a href="{{ p.get_absolute_url }}">{{ p.numero }}</a></td>
+              <td>{{ p.cliente.nome }}</td>
+              <td><span class="badge text-bg-light border">{{ p.get_status_display }}</span></td>
+              <td class="text-end">R$ {{ p.total|floatformat:2|intcomma }}</td>
+              <td class="small text-secondary">{{ p.criado_em|date:"d/m/Y H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-secondary">Nenhum pedido registrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="small text-secondary mb-0">Pagamentos pendentes: {{ pagamentos_pendentes }}</p>
+  </div>
+</div>
+{% endblock %}

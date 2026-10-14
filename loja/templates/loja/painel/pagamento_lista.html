@@ -1,0 +1,13 @@
+{% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}Pagamentos{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h4 mb-0">Pagamentos</h1><a class="btn btn-hd-outline" href="{% url 'loja:pedido_lista' %}">Ver pedidos</a></div>
+<form class="row g-2 mb-3" method="get"><div class="col-8 col-md-3"><select class="form-select" name="status"><option value="">Todos os status</option>{% for valor, rotulo in status_opcoes %}<option value="{{ valor }}" {% if valor == status %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></div><div class="col-auto"><button class="btn btn-hd-outline">Filtrar</button></div></form>
+<div class="card border-0 shadow-sm rounded-4"><div class="card-body table-responsive"><table class="table align-middle"><thead><tr><th>Pedido</th><th>Cliente</th><th>Método</th><th>Status</th><th class="text-end">Valor</th><th>Data</th><th></th></tr></thead><tbody>
+{% for pg in pagina %}<tr><td><a href="{% url 'loja:pedido_detalhe' pg.pedido.pk %}">{{ pg.pedido.numero }}</a></td><td>{{ pg.pedido.cliente.nome }}</td><td>{{ pg.get_metodo_display }}</td><td><span class="badge text-bg-light border">{{ pg.get_status_display }}</span></td><td class="text-end">R$ {{ pg.valor|floatformat:2|intcomma }}</td><td class="small text-secondary">{{ pg.criado_em|date:"d/m/Y H:i" }}</td><td class="text-end"><a class="btn btn-sm btn-hd-outline" href="{% url 'loja:pagamento_editar' pg.pk %}">Editar</a></td></tr>
+{% empty %}<tr><td colspan="7" class="text-secondary">Nenhum pagamento registrado.</td></tr>{% endfor %}
+</tbody></table>{% include "loja/painel/_paginacao.html" %}</div></div>
+{% endblock %}

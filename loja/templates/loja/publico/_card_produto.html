@@ -1,0 +1,21 @@
+{% load humanize %}
+<a class="hd-card d-block text-decoration-none" href="{{ produto.get_absolute_url }}">
+  {% if produto.imagem_principal %}
+    <img class="hd-card-img" src="{{ produto.imagem_principal.imagem.url }}" alt="{{ produto.nome }}" loading="lazy">
+  {% else %}
+    <div class="hd-card-img d-flex align-items-center justify-content-center text-secondary small">Sem imagem</div>
+  {% endif %}
+  <div class="p-3">
+    {% if produto.destaque %}<span class="badge hd-badge-destaque mb-2">Destaque</span>{% endif %}
+    <h3 class="h6 mb-1">{{ produto.nome }}</h3>
+    <p class="small text-secondary mb-2">{{ produto.descricao_curta|default:"" }}</p>
+    {% if produto.variacoes_ativas %}
+      <span class="hd-preco">A partir de R$ {{ produto.preco_minimo|floatformat:2|intcomma }}</span>
+      <div class="small text-secondary">{{ produto.variacoes_ativas|length }} variação(ões)</div>
+    {% elif produto.preco %}
+      <span class="hd-preco">R$ {{ produto.preco|floatformat:2|intcomma }}</span>
+    {% else %}
+      <span class="small text-secondary">Consulte o valor</span>
+    {% endif %}
+  </div>
+</a>

@@ -1,0 +1,51 @@
+
+{% extends "loja/painel/base_painel.html" %}
+
+{% block titulo %}Excluir insumo | Hermana Doces{% endblock %}
+
+{% block corpo %}
+<main class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <h1 class="h4 mb-3">Excluir insumo</h1>
+
+                    <p>
+                        Deseja realmente excluir
+                        <strong>{{ insumo.nome }}</strong>?
+                    </p>
+
+                    <p class="text-secondary small">
+                        Se o insumo estiver vinculado a uma ficha técnica,
+                        a exclusão poderá ser impedida.
+                    </p>
+
+                    <form method="post"
+                          action="{% url 'loja:insumo_excluir' insumo.pk %}">
+                        {% csrf_token %}
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'loja:insumo_lista' %}"
+                               class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-danger">
+                                Confirmar exclusão
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+{% endblock %}

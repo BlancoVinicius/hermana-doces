@@ -1,0 +1,10 @@
+{% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}{{ titulo }}{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"><h1 class="h4 mb-0">{{ titulo }}</h1><a class="btn btn-hd-outline" href="{% url 'loja:pedido_detalhe' pedido.pk %}">Voltar ao pedido</a></div>
+<div class="card border-0 shadow-sm rounded-4 mb-3"><div class="card-body"><div class="row g-3"><div class="col-12 col-md-6"><div class="small text-secondary">Pedido</div><strong>{{ pedido.numero }}</strong></div><div class="col-12 col-md-6"><div class="small text-secondary">Cliente</div><strong>{{ pedido.cliente.nome }}</strong></div><div class="col-12 col-md-6"><div class="small text-secondary">Total do pedido</div><strong>R$ {{ pedido.total|floatformat:2|intcomma }}</strong></div></div></div></div>
+<form method="post" novalidate>{% csrf_token %}<div class="card border-0 shadow-sm rounded-4"><div class="card-body"><div class="row g-3">{% for field in form %}<div class="col-12 col-md-6"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}</div>{% endfor %}</div><div class="d-flex justify-content-end gap-2 mt-4"><a class="btn btn-hd-outline" href="{% url 'loja:pedido_detalhe' pedido.pk %}">Cancelar</a><button class="btn btn-hd" type="submit">Salvar pagamento</button></div></div></div></form>
+{% endblock %}

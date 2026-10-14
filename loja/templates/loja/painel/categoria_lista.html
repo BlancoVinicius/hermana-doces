@@ -1,0 +1,46 @@
+{% extends "loja/painel/base_painel.html" %}
+
+{% block titulo_pagina %}Categorias{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">Categorias</h1>
+  <a class="btn btn-hd" href="{% url 'loja:categoria_nova' %}">Nova categoria</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-12 col-md-4"><input class="form-control" type="search" name="q" value="{{ busca }}" placeholder="Buscar categoria"></div>
+  <div class="col-auto"><button class="btn btn-hd-outline">Filtrar</button></div>
+</form>
+
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Nome</th><th>Slug</th><th>Ordem</th><th>Produtos</th><th>Status</th><th class="text-end">Ações</th></tr></thead>
+      <tbody>
+        {% for c in pagina %}
+          <tr>
+            <td>{{ c.nome }}</td>
+            <td class="small text-secondary">{{ c.slug }}</td>
+            <td>{{ c.ordem }}</td>
+            <td>{{ c.qtd_produtos }}</td>
+            <td>{% if c.ativa %}<span class="badge text-bg-success">Ativa</span>{% else %}<span class="badge text-bg-secondary">Inativa</span>{% endif %}</td>
+            <td class="text-end">
+              <div class="d-inline-flex gap-1">
+                <a class="btn btn-sm btn-hd-outline" href="{% url 'loja:categoria_editar' c.pk %}">Editar</a>
+                <form method="post" action="{% url 'loja:categoria_toggle' c.pk %}">{% csrf_token %}
+                  <button class="btn btn-sm btn-hd-outline">{% if c.ativa %}Desativar{% else %}Ativar{% endif %}</button>
+                </form>
+                <a class="btn btn-sm btn-outline-danger" href="{% url 'loja:categoria_excluir' c.pk %}">Excluir</a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-secondary">Nenhuma categoria cadastrada.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% include "loja/painel/_paginacao.html" %}
+  </div>
+</div>
+{% endblock %}

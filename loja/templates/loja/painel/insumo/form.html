@@ -1,0 +1,81 @@
+
+{% extends "loja/painel/base_painel.html" %}
+
+{% block titulo %}{{ titulo }} | Hermana Doces{% endblock %}
+
+{% block conteudo %}
+<main class="container py-4">
+
+    <div class="mb-4">
+        <a href="{% url 'loja:insumo_lista' %}"
+           class="text-decoration-none">
+            &larr; Voltar para insumos
+        </a>
+
+        <h1 class="h3 mt-3 mb-1">{{ titulo }}</h1>
+        <p class="text-secondary mb-0">
+            Informe os dados do insumo.
+        </p>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+
+                    {% for field in form %}
+                        <div class="col-md-6">
+
+                            <label for="{{ field.id_for_label }}"
+                                   class="form-label">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <div class="form-text">
+                                    {{ field.help_text }}
+                                </div>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'loja:insumo_lista' %}"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Salvar insumo
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</main>
+{% endblock %}

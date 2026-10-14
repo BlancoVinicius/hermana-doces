@@ -1,0 +1,94 @@
+{% extends "loja/painel/base_painel.html" %}
+{% load humanize %}
+
+{% block titulo_pagina %}{{ titulo }}{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h1 class="h4 mb-0">{{ titulo }}</h1>
+  <a class="btn btn-hd-outline" href="{% url 'loja:pedido_lista' %}">Voltar aos pedidos</a>
+</div>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+  <div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Dados do pedido</h2>
+      <div class="row g-3">
+        {% for field in form %}
+          <div class="col-12 {% if field.name == 'cliente' or field.name == 'endereco_entrega' %}col-md-6{% else %}col-md-4{% endif %}">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <p class="form-text mb-0 mt-2">O endereço selecionado deve pertencer ao cliente escolhido.</p>
+    </div>
+  </div>
+
+  <div class="card border-0 shadow-sm rounded-4 mb-3">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h2 class="h6 mb-0">Produtos do pedido</h2>
+        <button class="btn btn-sm btn-hd-outline" type="button" id="adicionar-item">Adicionar produto</button>
+      </div>
+      {{ formset.management_form }}
+      {% if formset.non_form_errors %}<div class="alert alert-danger">{{ formset.non_form_errors }}</div>{% endif %}
+      <div id="itens-pedido" class="d-flex flex-column gap-3">
+        {% for item_form in formset %}
+          <div class="pedido-item border rounded-3 p-3">
+            {% for hidden in item_form.hidden_fields %}{{ hidden }}{% endfor %}
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-7">
+                <label class="form-label">{{ item_form.produto.label }}</label>{{ item_form.produto }}
+                {% for error in item_form.produto.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="col-8 col-md-2">
+                <label class="form-label">{{ item_form.quantidade.label }}</label>{{ item_form.quantidade }}
+                {% for error in item_form.quantidade.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="col-4 col-md-3">
+                {% if item_form.DELETE %}<div class="form-check mb-2">{{ item_form.DELETE }}<label class="form-check-label">Remover linha</label></div>{% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <template id="item-vazio">
+        <div class="pedido-item border rounded-3 p-3">
+          {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+          <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-7"><label class="form-label">Produto</label>{{ formset.empty_form.produto }}</div>
+            <div class="col-8 col-md-2"><label class="form-label">Quantidade</label>{{ formset.empty_form.quantidade }}</div>
+            <div class="col-4 col-md-3"><div class="form-check mb-2">{{ formset.empty_form.DELETE }}<label class="form-check-label">Remover linha</label></div></div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <a class="btn btn-hd-outline" href="{% url 'loja:pedido_lista' %}">Cancelar</a>
+    <button class="btn btn-hd" type="submit">Salvar pedido</button>
+  </div>
+</form>
+
+<script>
+(() => {
+  const addButton = document.getElementById('adicionar-item');
+  const container = document.getElementById('itens-pedido');
+  const totalForms = document.getElementById('id_itens-TOTAL_FORMS');
+  const template = document.getElementById('item-vazio');
+  if (!addButton || !container || !totalForms || !template) return;
+  addButton.addEventListener('click', () => {
+    const index = Number(totalForms.value);
+    const html = template.innerHTML.replace(/__prefix__/g, index);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html.trim();
+    container.appendChild(wrapper.firstElementChild);
+    totalForms.value = index + 1;
+  });
+})();
+</script>
+{% endblock %}

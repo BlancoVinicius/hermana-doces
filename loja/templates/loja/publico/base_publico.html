@@ -1,0 +1,38 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block corpo %}
+<nav class="navbar navbar-expand-lg hd-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'loja:home' %}">
+      <img src="{% static 'img/hermana-logo.png' %}" alt="Hermana Doces" class="hd-logo">
+      <span class="hd-serif fs-4 d-none d-sm-inline">Hermana Doces</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico" aria-controls="menuPublico" aria-expanded="false" aria-label="Abrir menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="menuPublico">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:home' %}#destaques">Destaques</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:home' %}#catalogo">Catálogo</a></li>
+        <li class="nav-item">
+          <a class="btn btn-hd btn-sm px-3" href="{% if user.is_authenticated %}{% url 'loja:dashboard' %}{% else %}{% url 'loja:login' %}{% endif %}">
+            {% if user.is_authenticated %}Painel{% else %}Entrar{% endif %}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="flex-grow-1">
+  {% block conteudo %}{% endblock %}
+</main>
+
+<footer class="hd-footer mt-5 py-4">
+  <div class="container d-flex flex-column flex-md-row justify-content-between gap-2 small">
+    <span>© Hermana Doces — doces artesanais feitos com carinho.</span>
+    <span>Encomendas pelo WhatsApp e redes sociais.</span>
+  </div>
+</footer>
+{% endblock %}

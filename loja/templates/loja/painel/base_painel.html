@@ -1,0 +1,60 @@
+{% extends "loja/base.html" %}
+{% load static %}
+
+{% block titulo %}{% block titulo_pagina %}Painel{% endblock %} — Hermana Doces{% endblock %}
+
+{% block head_extra %}
+<style>
+  @media (min-width: 992px) {
+    .hd-sidebar {
+      min-height: 100vh;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block corpo %}
+<nav class="navbar hd-navbar">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'loja:dashboard' %}">
+      <img src="{% static 'img/hermana-logo.png' %}" alt="Hermana Doces" class="hd-logo">
+      <span class="hd-serif d-none d-sm-inline">Painel Hermana Doces</span>
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <a class="btn btn-sm btn-hd-outline" href="{% url 'loja:home' %}" target="_blank">Ver site</a>
+      <span class="small text-secondary d-none d-md-inline">{{ user.get_username }}</span>
+      <form method="post" action="{% url 'loja:logout' %}">{% csrf_token %}
+        <button class="btn btn-sm btn-hd-outline">Sair</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid flex-grow-1">
+  <div class="row h-100">
+    <aside class="col-12 col-lg-2 bg-white border-end py-3 hd-sidebar">
+    {% comment %} <aside class="col-12 col-lg-2 hd-sidebar bg-white border-end min-vh-100 py-3"> {% endcomment %}
+      <ul class="nav nav-pills flex-lg-column gap-1">
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'loja:dashboard' %}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:produto_lista' %}">Produtos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:insumo_lista' %}">Insumos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:categoria_lista' %}">Categorias</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:cliente_lista' %}">Clientes</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:pedido_lista' %}">Pedidos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'loja:pagamento_lista' %}">Pagamentos</a></li>
+      </ul>
+    </aside>
+
+    <main class="col-12 col-lg-10 py-4">
+      {% if messages %}
+        {% for m in messages %}
+          <div class="alert alert-{{ m.tags|default:'info' }} alert-dismissible fade show" role="alert">
+            {{ m }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% block conteudo %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}
