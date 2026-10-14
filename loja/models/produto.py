@@ -58,6 +58,15 @@ class Produto(PolymorphicModel):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def imagem_principal(self):
+        imagens = self.imagens.all()
+        return next((imagem for imagem in imagens if imagem.principal), imagens.first())
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("loja:produto_publico", kwargs={"slug": self.slug})
     
     def save(self, *args, **kwargs):
         if self.__class__ is Produto:
