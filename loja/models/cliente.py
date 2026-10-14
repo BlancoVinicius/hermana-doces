@@ -15,6 +15,7 @@ class Cliente(models.Model):
         default=False,
         verbose_name="Aceita receber propaganda",
     )
+    ativo = models.BooleanField(default=True, verbose_name="Ativo")
 
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
