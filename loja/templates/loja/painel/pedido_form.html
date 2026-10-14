@@ -91,4 +91,34 @@
   });
 })();
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const cliente = document.getElementById("id_cliente");
+      const endereco = document.getElementById("id_endereco_entrega");
+
+      if (!cliente || !endereco) return;
+
+      cliente.addEventListener("change", async function () {
+          const clienteId = this.value;
+
+          endereco.innerHTML = '<option value="">---------</option>';
+
+          if (!clienteId) return;
+
+          const url = `{% url 'loja:enderecos_cliente' %}?cliente_id=${encodeURIComponent(clienteId)}`;
+          const response = await fetch(url);
+
+          if (!response.ok) return;
+
+          const dados = await response.json();
+
+          dados.forEach(function (item) {
+              const option = document.createElement("option");
+              option.value = item.id;
+              option.textContent = item.texto;
+              endereco.appendChild(option);
+          });
+      });
+  });
+  </script>
 {% endblock %}

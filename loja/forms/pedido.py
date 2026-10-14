@@ -44,6 +44,23 @@ class PedidoForm(forms.Form):
         widget=forms.NumberInput(attrs={"class": "form-control", "min": "0", "step": "0.01"}),
     )
 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["endereco_entrega"].queryset = Endereco.objects.none()
+
+        cliente_id = (
+            self.data.get("cliente")
+            or self.initial.get("cliente")
+        )
+
+        if cliente_id:
+            self.fields["endereco_entrega"].queryset = (
+                Endereco.objects.filter(cliente_id=cliente_id)
+                .order_by("logradouro")
+            )
+
     def clean(self):
         cleaned = super().clean()
         cliente = cleaned.get("cliente")
@@ -51,8 +68,7 @@ class PedidoForm(forms.Form):
         if cliente and endereco and endereco.cliente_id != cliente.pk:
             self.add_error("endereco_entrega", "Selecione um endereço pertencente ao cliente escolhido.")
         return cleaned
-
-
+    
 class ItemPedidoForm(forms.Form):
     produto = forms.ModelChoiceField(
         label="Produto",

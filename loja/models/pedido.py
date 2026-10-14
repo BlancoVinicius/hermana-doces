@@ -32,6 +32,8 @@ class Pedido(models.Model):
     endereco_entrega = models.ForeignKey(
         "loja.Endereco",
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="pedidos",
         verbose_name="Endereço de Entrega",
     )

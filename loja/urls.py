@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
+from loja import views_clientes
 from loja.views import (
     insumo_lista, insumo_criar, insumo_editar, insumo_confirmar_exclusao, insumo_excluir,
     produto_excluir, doce_insumo_adicionar, doce_insumo_remover, item_kit_adicionar,
@@ -67,4 +68,7 @@ urlpatterns = [
     path("pagamentos/", pagamento_lista, name="pagamento_lista"),
     path("pedidos/<uuid:pedido_pk>/pagamento/", pagamento_novo, name="pagamento_novo"),
     path("pagamentos/<uuid:pk>/editar/", pagamento_editar, name="pagamento_editar"),
+
+    # Endereços Cliente
+    path("enderecos-cliente/", views_clientes.enderecos_cliente, name="enderecos_cliente"),
 ]

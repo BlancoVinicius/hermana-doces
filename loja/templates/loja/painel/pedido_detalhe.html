@@ -25,12 +25,69 @@
   <div class="col-12 col-lg-8">
     <div class="card border-0 shadow-sm rounded-4 mb-3"><div class="card-body">
       <h2 class="h6">Itens do pedido</h2><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Produto</th><th>Quantidade</th><th class="text-end">Preço unitário</th><th class="text-end">Total</th><th></th></tr></thead><tbody>
-      {% for item in itens %}<tr><td>{{ item.produto.nome }}</td><td>{{ item.quantidade }}</td><td class="text-end">R$ {{ item.preco_unitario|floatformat:2|intcomma }}</td><td class="text-end">R$ {{ item.preco_total|floatformat:2|intcomma }}</td><td class="text-end"><form method="post" action="{% url 'loja:item_excluir' item.pk %}" onsubmit="return confirm('Remover este item?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Remover</button></form></td></tr>
-      {% empty %}<tr><td colspan="5" class="text-secondary">Este pedido ainda não possui itens.</td></tr>{% endfor %}
+      {% for item in itens %}
+        <tr>
+          <td>{{ item.produto.nome }}</td>
+          <td>{{ item.quantidade }}</td>
+          <td class="text-end">R$ {{ item.preco_unitario|floatformat:2|intcomma }}</td>
+          <td class="text-end">R$ {{ item.preco_total|floatformat:2|intcomma }}</td>
+          <td class="text-end">
+            <form method="post" action="{% url 'loja:item_excluir' item.pk %}" onsubmit="return confirm('Remover este item?')">
+              {% csrf_token %}
+              {% if pedido.status == 'ENTREGUE' or pedido.status == 'ENVIADO' or pedido.status == 'CANCELADO' %}
+                <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Remover</button>
+              {% else %}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="5" class="text-secondary">Este pedido ainda não possui itens.</td>
+        </tr>
+      {% endfor %}
       </tbody></table></div>
-      <form method="post" action="{% url 'loja:item_adicionar' pedido.pk %}" class="row g-2 align-items-end border-top pt-3">{% csrf_token %}<div class="col-12 col-md-7"><label class="form-label">Produto</label>{{ form_item.produto }}</div><div class="col-6 col-md-2"><label class="form-label">Quantidade</label>{{ form_item.quantidade }}</div><div class="col-6 col-md-3"><button class="btn btn-hd w-100">Adicionar item</button></div></form>
+      {% if pedido.status == 'ENTREGUE' or pedido.status == 'ENVIADO' or pedido.status == 'CANCELADO' %}
+        <div class="alert alert-secondary" role="alert">
+          Itens deste pedido não podem ser modificados.
+        </div>
+      {% else %}
+        <form method="post" action="{% url 'loja:item_adicionar' pedido.pk %}" class="row g-2 align-items-end border-top pt-3">
+          {% csrf_token %}
+          <div class="col-12 col-md-7">
+            <label class="form-label">Produto</label>
+            {{ form_item.produto }}
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Quantidade</label>
+          {{ form_item.quantidade }}
+        </div>
+        <div class="col-6 col-md-3">
+          <button class="btn btn-hd w-100">Adicionar item</button>
+        </div>
+      </form>
+      {% endif %}
     </div></div>
-    <div class="card border-0 shadow-sm rounded-4"><div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2"><div><h2 class="h6 mb-1">Pagamento</h2>{% if pagamento %}<div class="small text-secondary">{{ pagamento.get_metodo_display }} · {{ pagamento.get_status_display }} · R$ {{ pagamento.valor|floatformat:2|intcomma }}</div>{% else %}<div class="small text-secondary">Nenhum pagamento registrado.</div>{% endif %}</div>{% if pagamento %}<a class="btn btn-hd-outline" href="{% url 'loja:pagamento_editar' pagamento.pk %}">Editar pagamento</a>{% else %}<a class="btn btn-hd" href="{% url 'loja:pagamento_novo' pedido.pk %}">Registrar pagamento</a>{% endif %}</div></div>
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h2 class="h6 mb-1">Pagamento</h2>
+          {% if pagamento %}
+            <div class="small text-secondary">
+              {{ pagamento.get_metodo_display }} · {{ pagamento.get_status_display }} · R$ {{ pagamento.valor|floatformat:2|intcomma }}
+            </div>
+          {% else %}
+            <div class="small text-secondary">Nenhum pagamento registrado.</div>
+          {% endif %}
+        </div>
+        {% if pagamento %}
+          <a class="btn btn-hd-outline" href="{% url 'loja:pagamento_editar' pagamento.pk %}">Editar pagamento</a>
+        {% else %}
+          <a class="btn btn-hd" href="{% url 'loja:pagamento_novo' pedido.pk %}">Registrar pagamento</a>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

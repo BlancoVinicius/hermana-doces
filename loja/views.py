@@ -480,6 +480,14 @@ def pedido_status(request, pk):
 @require_POST
 def item_adicionar(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
+    try:
+        if pedido.status in [StatusPedido.ENTREGUE, StatusPedido.ENVIADO, StatusPedido.CANCELADO]:
+            messages.error(request, "Não é possível adicionar itens a pedidos finalizados ou cancelados.")
+            return redirect("loja:pedido_detalhe", pk=pedido.pk)
+    except ValidationError as exc:
+        messages.error(request, f"{exc.messages[0]}")
+        return redirect("loja:pedido_detalhe", pk=pedido.pk)
+    
     form = ItemPedidoForm(request.POST)
     if form.is_valid():
         produto = form.cleaned_data["produto"]
@@ -499,13 +507,16 @@ def item_adicionar(request, pk):
 
 @require_POST
 def item_excluir(request, pk):
-    item = get_object_or_404(ItemPedido.objects.select_related("pedido"), pk=pk)
-    pedido = item.pedido
-    item.delete()
-    pedido.atualizar_totais()
-    messages.success(request, "Item removido do pedido.")
-    return redirect("loja:pedido_detalhe", pk=pedido.pk)
-
+    try:
+        item = get_object_or_404(ItemPedido.objects.select_related("pedido"), pk=pk)
+        pedido = item.pedido
+        item.delete()
+        pedido.atualizar_totais()
+        messages.success(request, "Item removido do pedido.")
+        return redirect("loja:pedido_detalhe", pk=pedido.pk)
+    except ValidationError as exc:
+        messages.error(request, f"{exc.messages[0]}")
+        return redirect("loja:pedido_detalhe", pk=item.pedido.pk)
 
 def pagamento_lista(request):
     status = request.GET.get("status", "").strip()

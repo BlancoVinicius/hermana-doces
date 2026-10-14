@@ -8,7 +8,7 @@ class Cliente(models.Model):
 
     nome = models.CharField(max_length=150, verbose_name="Nome")
     email = models.EmailField(blank=True, null=True, verbose_name="E-mail")
-    telefone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefone")
+    telefone = models.CharField(max_length=20, verbose_name="Telefone")
     documento = models.CharField(max_length=20, blank=True, null=True, verbose_name="Documento")
 
     aceita_receber_propaganda = models.BooleanField(

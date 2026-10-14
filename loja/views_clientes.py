@@ -9,7 +9,9 @@ from loja.models import (
     Cliente, Endereco, Produto, Pedido, Pagamento,
     StatusPedido, StatusPagamento,
 )
-
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from loja.models import Endereco
 
 def dashboard(request):
     pedidos_nao_cancelados = Pedido.objects.exclude(status=StatusPedido.CANCELADO)
@@ -147,3 +149,23 @@ def endereco_excluir(request, pk):
     else:
         messages.success(request, "Endereço excluído.")
     return redirect("loja:cliente_detalhe", pk=cliente_pk)
+
+
+
+@login_required
+def enderecos_cliente(request):
+    cliente_id = request.GET.get("cliente_id")
+
+    enderecos = Endereco.objects.filter(
+        cliente_id=cliente_id
+    ).order_by("logradouro")
+
+    dados = [
+        {
+            "id": str(endereco.pk),
+            "texto": str(endereco),
+        }
+        for endereco in enderecos
+    ]
+
+    return JsonResponse(dados, safe=False)

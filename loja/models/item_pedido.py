@@ -1,8 +1,10 @@
 import uuid
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from .pedido import StatusPedido
 
 
 class ItemPedido(models.Model):
@@ -46,6 +48,13 @@ class ItemPedido(models.Model):
             self.preco_total = self.preco_unitario * self.quantidade
         super().save(*args, **kwargs)
         self.pedido.atualizar_totais()
+
+    def delete(self, *args, **kwargs):
+        if self.pedido.status == StatusPedido.ENTREGUE or self.pedido.status == StatusPedido.CANCELADO or self.pedido.status == StatusPedido.ENVIADO:
+            raise ValidationError(
+                "Não é permitido excluir itens de um pedido entregue."
+            )
+        return super().delete(*args, **kwargs)
 
     def __str__(self):
         return f"{self.quantidade}x {self.produto.nome}"
