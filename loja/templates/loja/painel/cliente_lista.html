@@ -9,14 +9,21 @@
 </div>
 
 <form class="row g-2 mb-3" method="get">
-  <div class="col-12 col-md-4"><input class="form-control" type="search" name="q" value="{{ busca }}" placeholder="Nome, e-mail ou documento"></div>
-  <div class="col-auto"><button class="btn btn-hd-outline">Filtrar</button></div>
+  <div class="col-12 col-md-4"><input class="form-control" type="search" name="q" value="{{ busca }}" placeholder="Nome, e-mail, telefone ou documento"></div>
+  <div class="col-auto">
+    <select class="form-select" name="status">
+      <option value="ativos" {% if status == "ativos" %}selected{% endif %}>Clientes ativos</option>
+      <option value="inativos" {% if status == "inativos" %}selected{% endif %}>Clientes inativos</option>
+      <option value="todos" {% if status == "todos" %}selected{% endif %}>Todos</option>
+    </select>
+  </div>
+  <div class="col-auto"><button class="btn btn-hd-outline" type="submit">Filtrar</button></div>
 </form>
 
 <div class="card border-0 shadow-sm rounded-4">
   <div class="card-body table-responsive">
     <table class="table align-middle">
-      <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Pedidos</th><th class="text-end">Ações</th></tr></thead>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Pedidos</th><th>Status</th><th class="text-end">Ações</th></tr></thead>
       <tbody>
         {% for c in pagina %}
           <tr>
@@ -24,15 +31,23 @@
             <td class="small">{{ c.email|default:"—" }}</td>
             <td class="small">{{ c.telefone|default:"—" }}</td>
             <td>{{ c.qtd_pedidos }}</td>
+            <td>{% if c.ativo %}<span class="badge text-bg-success">Ativo</span>{% else %}<span class="badge text-bg-secondary">Inativo</span>{% endif %}</td>
             <td class="text-end">
               <div class="d-inline-flex gap-1">
                 <a class="btn btn-sm btn-hd-outline" href="{% url 'loja:cliente_editar' c.pk %}">Editar</a>
-                <a class="btn btn-sm btn-outline-danger" href="{% url 'loja:cliente_excluir' c.pk %}">Excluir</a>
+                <form method="post" action="{% url 'loja:cliente_alternar_status' c.pk %}">
+                  {% csrf_token %}
+                  {% if c.ativo %}
+                    <button class="btn btn-sm btn-outline-warning" type="submit">Desativar</button>
+                  {% else %}
+                    <button class="btn btn-sm btn-outline-success" type="submit">Reativar</button>
+                  {% endif %}
+                </form>
               </div>
             </td>
           </tr>
         {% empty %}
-          <tr><td colspan="5" class="text-secondary">Nenhum cliente cadastrado.</td></tr>
+          <tr><td colspan="6" class="text-secondary">Nenhum cliente encontrado.</td></tr>
         {% endfor %}
       </tbody>
     </table>
