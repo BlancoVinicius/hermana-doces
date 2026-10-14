@@ -25,6 +25,7 @@ class PedidoForm(forms.Form):
     endereco_entrega = forms.ModelChoiceField(
         label="Endereço de entrega",
         queryset=Endereco.objects.select_related("cliente").all(),
+        required=False,
         widget=forms.Select(attrs={"class": "form-select", "id": "id_endereco_entrega"}),
     )
     status = forms.ChoiceField(

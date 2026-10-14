@@ -554,6 +554,11 @@ def pagamento_novo(request, pedido_pk):
 
 def pagamento_editar(request, pk):
     pagamento = get_object_or_404(Pagamento.objects.select_related("pedido"), pk=pk)
+    
+    if pagamento.pedido.status in [StatusPedido.ENTREGUE, StatusPedido.ENVIADO]:
+        messages.error(request, "Não é permitido editar um pagamento de um pedido finalizado.")
+        return redirect("loja:pedido_detalhe", pk=pagamento.pedido.pk)
+    
     form = PagamentoForm(request.POST or None, instance=pagamento, pedido=pagamento.pedido)
     if request.method == "POST" and form.is_valid():
         pagamento = form.save()

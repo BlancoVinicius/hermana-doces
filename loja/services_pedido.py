@@ -28,7 +28,7 @@ def criar_pedido(*, dados_pedido, dados_itens):
 
     pedido = Pedido.objects.create(
         cliente=dados_pedido["cliente"],
-        endereco_entrega=dados_pedido["endereco_entrega"],
+        endereco_entrega=dados_pedido["endereco_entrega"] or None,
         status=dados_pedido["status"],
         frete=frete,
         desconto=desconto,
