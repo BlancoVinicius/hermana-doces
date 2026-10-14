@@ -28,12 +28,16 @@ from loja.views import (
     pagamento_novo,
     pagamento_editar,
 )
+from loja.views_publico import home_publica, produto_publico
 
 app_name = "loja"
 
 urlpatterns = [
+    # Loja pública
+    path("", home_publica, name="home"),
+    path("catalogo/<slug:slug>/", produto_publico, name="produto_publico"),
 
-    # Urls de produtos
+    # URLs de produtos do painel
     path("produtos/", produto_lista, name="produto_lista"),
     path("produtos/novo/", produto_novo, name="produto_novo"),
     path("produtos/<uuid:pk>/editar/", produto_editar, name="produto_editar"),
@@ -47,64 +51,19 @@ urlpatterns = [
     path("imagens/<uuid:pk>/principal/", imagem_definir_principal, name="imagem_principal"),
     path("imagens/<uuid:pk>/excluir/", imagem_excluir, name="imagem_excluir"),
 
+    # URLs de insumos
+    path("insumos/", insumo_lista, name="insumo_lista"),
+    path("insumos/novo/", insumo_criar, name="insumo_criar"),
+    path("insumos/<uuid:pk>/editar/", insumo_editar, name="insumo_editar"),
+    path("insumos/<uuid:pk>/excluir/", insumo_confirmar_exclusao, name="insumo_confirmar_exclusao"),
+    path("insumos/<uuid:pk>/excluir/confirmado/", insumo_excluir, name="insumo_excluir"),
 
-    # Urls de insumos
-    path(
-        "insumos/",
-        insumo_lista,
-        name="insumo_lista",
-    ),
-    path(
-        "insumos/novo/",
-        insumo_criar,
-        name="insumo_criar",
-    ),
-    path(
-        "insumos/<uuid:pk>/editar/",
-        insumo_editar,
-        name="insumo_editar",
-    ),
-    path(
-        "insumos/<uuid:pk>/excluir/",
-        insumo_confirmar_exclusao,
-        name="insumo_confirmar_exclusao",
-    ),
-    path(
-        "insumos/<uuid:pk>/excluir/confirmado/",
-        insumo_excluir,
-        name="insumo_excluir",
-    ),
-    # Urls de navegacao
-    path(
-        "dashboard/",
-        insumo_lista,
-        name="dashboard",
-    ),
-    path(
-        "home/",
-        insumo_lista,
-        name="home",
-    ),
-    path(
-        "logout/",
-        insumo_lista,    
-        name="logout",
-    ),
-    # path(
-    #     "produto_lista/",
-    #     insumo_lista,
-    #     name="produto_lista",
-    # ),
-    path(
-        "categoria_lista/",
-        insumo_lista,
-        name="categoria_lista",
-    ),
-    path(
-        "cliente_lista/",
-        insumo_lista,
-        name="cliente_lista",
-    ),
+    # Navegação do painel (rotas provisórias existentes)
+    path("dashboard/", insumo_lista, name="dashboard"),
+    path("logout/", insumo_lista, name="logout"),
+    path("categoria_lista/", insumo_lista, name="categoria_lista"),
+    path("cliente_lista/", insumo_lista, name="cliente_lista"),
+
     # Pedidos e itens
     path("pedidos/", pedido_lista, name="pedido_lista"),
     path("pedidos/novo/", pedido_novo, name="pedido_novo"),
@@ -112,6 +71,7 @@ urlpatterns = [
     path("pedidos/<uuid:pk>/status/", pedido_status, name="pedido_status"),
     path("pedidos/<uuid:pk>/itens/adicionar/", item_adicionar, name="item_adicionar"),
     path("itens-pedido/<uuid:pk>/remover/", item_excluir, name="item_excluir"),
+
     # Pagamentos
     path("pagamentos/", pagamento_lista, name="pagamento_lista"),
     path("pedidos/<uuid:pedido_pk>/pagamento/", pagamento_novo, name="pagamento_novo"),
