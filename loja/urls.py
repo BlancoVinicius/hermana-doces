@@ -24,8 +24,7 @@ urlpatterns = [
     path("", home_publica, name="home"),
     path("catalogo/<slug:slug>/", produto_publico, name="produto_publico"),
 
-
-    path("", dashboard, name="home"),
+    # Painel administrativo
     path("dashboard/", dashboard, name="dashboard"),
     path("logout/", auth_views.LogoutView.as_view(next_page="loja:home"), name="logout"),
 
