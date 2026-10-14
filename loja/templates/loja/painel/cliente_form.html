@@ -1,0 +1,30 @@
+{% extends "loja/painel/base_painel.html" %}
+
+{% block titulo_pagina %}{{ titulo }}{% endblock %}
+
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4 mb-0">{{ titulo }}</h1>
+  <a class="btn btn-hd-outline" href="{% if cliente %}{% url 'loja:cliente_detalhe' cliente.pk %}{% else %}{% url 'loja:cliente_lista' %}{% endif %}">Voltar</a>
+</div>
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          {% if field.field.widget.input_type == "checkbox" %}
+            <div class="form-check">{{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label></div>
+          {% else %}
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          {% endif %}
+          {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      <button class="btn btn-hd" type="submit">Salvar cliente</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
