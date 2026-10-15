@@ -1,0 +1,96 @@
+/* Identidade visual Hermana Doces - rosa suave, creme e marrom cacau */
+:root {
+  --hd-rosa: #f2c9cd;
+  --hd-rosa-claro: #fbeef0;
+  --hd-creme: #fdf8f4;
+  --hd-cacau: #4a2c2a;
+  --hd-cacau-suave: #7a5450;
+  --hd-dourado: #d9a441;
+  --hd-borda: #ecd9db;
+}
+
+body {
+  background-color: var(--hd-creme);
+  color: var(--hd-cacau);
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, .hd-serif {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--hd-cacau);
+}
+
+a { color: var(--hd-cacau-suave); }
+a:hover { color: var(--hd-cacau); }
+
+.hd-navbar {
+  background-color: #fff;
+  border-bottom: 3px solid var(--hd-rosa);
+}
+
+.hd-logo { height: 52px; width: auto; }
+
+.btn-hd {
+  background-color: var(--hd-rosa);
+  border: 1px solid var(--hd-rosa);
+  color: var(--hd-cacau);
+  font-weight: 600;
+}
+.btn-hd:hover { background-color: #e8b3b9; color: var(--hd-cacau); }
+
+.btn-hd-outline {
+  border: 1px solid var(--hd-cacau-suave);
+  color: var(--hd-cacau-suave);
+}
+.btn-hd-outline:hover { background-color: var(--hd-rosa-claro); color: var(--hd-cacau); }
+
+.hd-hero {
+  background: linear-gradient(180deg, var(--hd-rosa-claro), var(--hd-creme));
+  border-bottom: 1px solid var(--hd-borda);
+}
+
+.hd-card {
+  background: #fff;
+  border: 1px solid var(--hd-borda);
+  border-radius: 1rem;
+  overflow: hidden;
+  height: 100%;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.hd-card:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1.25rem rgba(74, 44, 42, .12); }
+
+.hd-card-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--hd-rosa-claro);
+}
+
+.hd-preco { color: var(--hd-cacau); font-weight: 700; }
+.hd-badge-destaque { background: var(--hd-dourado); color: #fff; }
+
+.hd-sidebar {
+  background: #fff;
+  border-right: 1px solid var(--hd-borda);
+  min-height: 100%;
+}
+.hd-sidebar .nav-link { color: var(--hd-cacau-suave); border-radius: .5rem; }
+.hd-sidebar .nav-link.active,
+.hd-sidebar .nav-link:hover { background: var(--hd-rosa-claro); color: var(--hd-cacau); }
+
+.hd-stat {
+  background: #fff;
+  border: 1px solid var(--hd-borda);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+}
+.hd-stat .valor { font-size: 1.75rem; font-weight: 700; }
+
+.hd-footer {
+  background: #fff;
+  border-top: 3px solid var(--hd-rosa);
+  color: var(--hd-cacau-suave);
+}
+
+.table > :not(caption) > * > * { background-color: transparent; }
+.card, .table-responsive { border-color: var(--hd-borda); }
