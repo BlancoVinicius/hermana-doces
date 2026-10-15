@@ -15,15 +15,17 @@
     {% endif %}
     <form method="post">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
       <div class="mb-3">
         <label class="form-label" for="id_username">Usuário</label>
-        <input type="text" name="username" id="id_username" class="form-control" required autofocus>
+        <input type="text" name="username"  autocomplete="username" id="id_username" class="form-control" required autofocus>
       </div>
       <div class="mb-3">
         <label class="form-label" for="id_password">Senha</label>
-        <input type="password" name="password" id="id_password" class="form-control" required>
+        <input type="password" name="password" id="id_password"
+              class="form-control" autocomplete="current-password" required>
       </div>
-      <button class="btn btn-hd w-100">Entrar</button>
+      <button type="submit" class="btn btn-hd w-100">Entrar</button>
     </form>
     <a class="text-center small mt-3" href="{% url 'loja:home' %}">Voltar ao site</a>
   </div>

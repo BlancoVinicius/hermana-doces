@@ -25,6 +25,7 @@ urlpatterns = [
     path("catalogo/<slug:slug>/", produto_publico, name="produto_publico"),
 
     # Painel administrativo
+    path("login/", auth_views.LoginView.as_view(template_name="loja/painel/login.html"), name="login"),
     path("dashboard/", dashboard, name="dashboard"),
     path("logout/", auth_views.LogoutView.as_view(next_page="loja:home"), name="logout"),
 

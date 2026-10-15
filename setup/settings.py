@@ -4,12 +4,19 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-f*zu3e2zjb(^m3h*!d7+u8i32+k(k&@vk21hq++dy8)pu8%9-('
-
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-chave-apenas-para-desenvolvimento-local",
+)
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
@@ -118,3 +125,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 #     },
 # }
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+LOGIN_REDIRECT_URL = "loja:dashboard"
+LOGIN_URL = "loja:login"
+LOGOUT_REDIRECT_URL = "loja:home"

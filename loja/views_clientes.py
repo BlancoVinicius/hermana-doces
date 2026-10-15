@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.db.models import ProtectedError
 
 from loja.forms.clientes import ClienteForm, EnderecoForm
 from loja.models import (
@@ -146,7 +147,7 @@ def endereco_excluir(request, pk):
     # Endereços usados em pedidos são protegidos pelo FK PROTECT do pedido.
     try:
         endereco.delete()
-    except Exception:
+    except ProtectedError:
         messages.error(request, "Não foi possível excluir este endereço: ele pode estar vinculado a um pedido.")
     else:
         messages.success(request, "Endereço excluído.")
