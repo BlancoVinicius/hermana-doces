@@ -3,6 +3,7 @@ from django.db.models import Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 
 from loja.forms.clientes import ClienteForm, EnderecoForm
 from loja.models import (
@@ -13,6 +14,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from loja.models import Endereco
 
+@login_required
 def dashboard(request):
     pedidos_nao_cancelados = Pedido.objects.exclude(status=StatusPedido.CANCELADO)
     pedidos_pendentes = Pedido.objects.filter(
@@ -33,7 +35,7 @@ def dashboard(request):
         ).count(),
     })
 
-
+@login_required
 def cliente_lista(request):
     busca = request.GET.get("q", "").strip()
     status = request.GET.get("status", "ativos").strip()
@@ -58,7 +60,7 @@ def cliente_lista(request):
         "status": status,
     })
 
-
+@login_required
 def cliente_novo(request):
     form = ClienteForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -69,7 +71,7 @@ def cliente_novo(request):
         "form": form, "titulo": "Novo cliente",
     })
 
-
+@login_required
 def cliente_editar(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     form = ClienteForm(request.POST or None, instance=cliente)
@@ -81,7 +83,7 @@ def cliente_editar(request, pk):
         "form": form, "cliente": cliente, "titulo": "Editar cliente",
     })
 
-
+@login_required
 def cliente_detalhe(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     pedidos = cliente.pedidos.order_by("-criado_em")
@@ -97,7 +99,7 @@ def cliente_detalhe(request, pk):
         "valor_total_pedidos": valor_total_pedidos,
     })
 
-
+@login_required
 @require_POST
 def cliente_alternar_status(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -109,7 +111,7 @@ def cliente_alternar_status(request, pk):
     )
     return redirect("loja:cliente_lista")
 
-
+@login_required
 def endereco_novo(request, cliente_pk):
     cliente = get_object_or_404(Cliente, pk=cliente_pk)
     form = EnderecoForm(request.POST or None)
@@ -123,7 +125,7 @@ def endereco_novo(request, cliente_pk):
         "form": form, "cliente": cliente, "titulo": "Novo endereço",
     })
 
-
+@login_required
 def endereco_editar(request, pk):
     endereco = get_object_or_404(Endereco.objects.select_related("cliente"), pk=pk)
     form = EnderecoForm(request.POST or None, instance=endereco)
@@ -136,7 +138,7 @@ def endereco_editar(request, pk):
         "titulo": "Editar endereço",
     })
 
-
+@login_required
 @require_POST
 def endereco_excluir(request, pk):
     endereco = get_object_or_404(Endereco.objects.select_related("cliente"), pk=pk)
@@ -151,7 +153,7 @@ def endereco_excluir(request, pk):
     return redirect("loja:cliente_detalhe", pk=cliente_pk)
 
 
-
+@login_required
 @login_required
 def enderecos_cliente(request):
     cliente_id = request.GET.get("cliente_id")

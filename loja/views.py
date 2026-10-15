@@ -5,6 +5,7 @@ from django.shortcuts import (
     redirect,
     render,
 )
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.db import transaction
@@ -20,7 +21,7 @@ from loja.models import (
 )
 from loja.services_pedido import criar_pedido
 
-
+@login_required
 def produto_lista(request):
     busca = request.GET.get("q", "").strip()
     categoria_sel = request.GET.get("categoria", "").strip()
@@ -57,7 +58,7 @@ def produto_lista(request):
         "status": status,
     })
 
-
+@login_required
 def produto_novo(request):
     form = ProdutoForm(request.POST or None)
 
@@ -92,7 +93,7 @@ def produto_novo(request):
         "titulo": "Novo produto",
     })
 
-
+@login_required
 def produto_editar(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
     form = ProdutoForm(
@@ -148,7 +149,7 @@ def produto_editar(request, pk):
 
     return render(request, "loja/painel/produto_editar.html", contexto)
 
-
+@login_required
 @require_POST
 def doce_insumo_adicionar(request, pk):
     doce = get_object_or_404(Doce, pk=pk)
@@ -168,7 +169,7 @@ def doce_insumo_adicionar(request, pk):
 
     return redirect("loja:produto_editar", pk=doce.pk)
 
-
+@login_required
 @require_POST
 def doce_insumo_remover(request, pk):
     ingrediente = get_object_or_404(DoceInsumo, pk=pk)
@@ -178,6 +179,7 @@ def doce_insumo_remover(request, pk):
     return redirect("loja:produto_editar", pk=doce_pk)
 
 
+@login_required
 @require_POST
 def item_kit_adicionar(request, pk):
     kit = get_object_or_404(Kit, pk=pk)
@@ -200,7 +202,7 @@ def item_kit_adicionar(request, pk):
 
     return redirect("loja:produto_editar", pk=kit.pk)
 
-
+@login_required
 @require_POST
 def item_kit_remover(request, pk):
     item = get_object_or_404(ItemKit, pk=pk)
@@ -209,7 +211,7 @@ def item_kit_remover(request, pk):
     messages.success(request, "Produto removido do kit.")
     return redirect("loja:produto_editar", pk=kit_pk)
 
-
+@login_required
 @require_POST
 def imagem_adicionar(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
@@ -230,6 +232,7 @@ def imagem_adicionar(request, pk):
     return redirect("loja:produto_editar", pk=produto.pk)
 
 
+@login_required
 @require_POST
 def imagem_definir_principal(request, pk):
     imagem = get_object_or_404(ProdutoImagem, pk=pk)
@@ -240,7 +243,7 @@ def imagem_definir_principal(request, pk):
     messages.success(request, "Imagem principal atualizada.")
     return redirect("loja:produto_editar", pk=produto_pk)
 
-
+@login_required
 @require_POST
 def imagem_excluir(request, pk):
     imagem = get_object_or_404(ProdutoImagem, pk=pk)
@@ -257,7 +260,7 @@ def imagem_excluir(request, pk):
     messages.success(request, "Imagem excluída.")
     return redirect("loja:produto_editar", pk=produto.pk)
 
-
+@login_required
 @require_POST
 def produto_toggle(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
@@ -270,7 +273,7 @@ def produto_toggle(request, pk):
     )
     return redirect("loja:produto_lista")
 
-
+@login_required
 def produto_excluir(request, pk):
     produto = get_object_or_404(Produto, pk=pk)
 
@@ -292,10 +295,8 @@ def produto_excluir(request, pk):
         "produto": produto,
     })
 
-
-
-
 # CRUD de insumos
+@login_required
 def insumo_lista(request):
     busca = request.GET.get("q", "").strip()
 
@@ -313,7 +314,7 @@ def insumo_lista(request):
         },
     )
 
-
+@login_required
 def insumo_criar(request):
     form = InsumoForm(request.POST or None)
 
@@ -337,6 +338,7 @@ def insumo_criar(request):
     )
 
 
+@login_required
 def insumo_editar(request, pk):
     insumo = get_object_or_404(Insumo, pk=pk)
 
@@ -365,7 +367,7 @@ def insumo_editar(request, pk):
         },
     )
 
-
+@login_required
 def insumo_confirmar_exclusao(request, pk):
     insumo = get_object_or_404(Insumo, pk=pk)
 
@@ -375,7 +377,7 @@ def insumo_confirmar_exclusao(request, pk):
         {"insumo": insumo},
     )
 
-
+@login_required
 @require_POST
 def insumo_excluir(request, pk):
     insumo = get_object_or_404(Insumo, pk=pk)
@@ -401,6 +403,7 @@ def insumo_excluir(request, pk):
 # ---------------------------------------------------------------------------
 # PEDIDOS, ITENS DO PEDIDO E PAGAMENTOS
 # ---------------------------------------------------------------------------
+@login_required
 def pedido_lista(request):
     busca = request.GET.get("q", "").strip()
     status = request.GET.get("status", "").strip()
@@ -424,6 +427,7 @@ def pedido_lista(request):
     })
 
 
+@login_required
 def pedido_novo(request):
     form = PedidoForm(request.POST or None)
     formset = ItemPedidoFormSet(request.POST or None, prefix="itens")
@@ -444,7 +448,7 @@ def pedido_novo(request):
         "titulo": "Novo pedido",
     })
 
-
+@login_required
 def pedido_detalhe(request, pk):
     pedido = get_object_or_404(
         Pedido.objects.select_related("cliente", "endereco_entrega").prefetch_related("itens__produto"),
@@ -463,7 +467,7 @@ def pedido_detalhe(request, pk):
         "pagamento": pagamento,
     })
 
-
+@login_required
 @require_POST
 def pedido_status(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -476,7 +480,7 @@ def pedido_status(request, pk):
         messages.success(request, "Status do pedido atualizado.")
     return redirect("loja:pedido_detalhe", pk=pedido.pk)
 
-
+@login_required
 @require_POST
 def item_adicionar(request, pk):
     pedido = get_object_or_404(Pedido, pk=pk)
@@ -504,7 +508,7 @@ def item_adicionar(request, pk):
         messages.error(request, "Não foi possível adicionar o item. Confira o produto e a quantidade.")
     return redirect("loja:pedido_detalhe", pk=pedido.pk)
 
-
+@login_required
 @require_POST
 def item_excluir(request, pk):
     try:
@@ -518,6 +522,8 @@ def item_excluir(request, pk):
         messages.error(request, f"{exc.messages[0]}")
         return redirect("loja:pedido_detalhe", pk=item.pedido.pk)
 
+
+@login_required
 def pagamento_lista(request):
     status = request.GET.get("status", "").strip()
     pagamentos = Pagamento.objects.select_related("pedido", "pedido__cliente")
@@ -531,6 +537,7 @@ def pagamento_lista(request):
     })
 
 
+@login_required
 def pagamento_novo(request, pedido_pk):
     pedido = get_object_or_404(Pedido, pk=pedido_pk)
     try:
@@ -552,6 +559,7 @@ def pagamento_novo(request, pedido_pk):
     })
 
 
+@login_required
 def pagamento_editar(request, pk):
     pagamento = get_object_or_404(Pagamento.objects.select_related("pedido"), pk=pk)
     
@@ -572,6 +580,7 @@ def pagamento_editar(request, pk):
     })
 
 
+@login_required
 def _sincronizar_status_pedido(pedido, pagamento):
     if pagamento.status == StatusPagamento.APROVADO and pagamento.valor >= pedido.total:
         novo_status = StatusPedido.PAGO

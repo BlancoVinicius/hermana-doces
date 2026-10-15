@@ -3,7 +3,6 @@ from django.shortcuts import get_object_or_404, render
 
 from loja.models import Categoria, Produto, ProdutoImagem
 
-
 def _produtos_publicos():
     return (
         Produto.objects.filter(ativo=True, categoria__ativa=True)

@@ -50,7 +50,7 @@ urlpatterns = [
     path("insumos/<uuid:pk>/excluir/confirmado/", insumo_excluir, name="insumo_excluir"),
 
     # Categorias: o CRUD de categorias ainda deve ser ligado às views próprias.
-    path("categoria_lista/", insumo_lista, name="categoria_lista"),
+    # path("categoria_lista/", insumo_lista, name="categoria_lista"),
 
     # Clientes: não há exclusão física; somente desativação reversível.
     path("clientes/", cliente_lista, name="cliente_lista"),
