@@ -1,10 +1,15 @@
 {% load humanize %}
 <a class="hd-card d-block text-decoration-none" href="{% url 'loja:produto_publico' slug=produto.slug %}">
-  {% if produto.imagem_principal %}
-    <img class="hd-card-img" src="{{ produto.imagem_principal.imagem.url }}" alt="{{ produto.nome }}" loading="lazy">
-  {% else %}
-    <div class="hd-card-img d-flex align-items-center justify-content-center text-secondary small">Sem imagem</div>
-  {% endif %}
+  {% with imagem=produto.imagens.all %}
+    {% for img in imagem %}
+      {% if img.principal %}
+        <img class="hd-card-img" src="{{ img.imagem.url }}" alt="{{ produto.nome }}" loading="lazy">
+      {% endif %}
+    {% empty %}
+      <div class="hd-card-img d-flex align-items-center justify-content-center text-secondary small">Sem imagem</div>
+    {% endfor %}
+  {% endwith %}
+
   <div class="p-3">
     {% if produto.destaque %}<span class="badge hd-badge-destaque mb-2">Destaque</span>{% endif %}
     <h3 class="h6 mb-1">{{ produto.nome }}</h3>

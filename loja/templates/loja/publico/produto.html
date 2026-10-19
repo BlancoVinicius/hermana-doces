@@ -16,11 +16,21 @@
 
   <div class="row g-5">
     <div class="col-12 col-lg-6">
-      {% if produto.imagem_principal %}
-        <img src="{{ produto.imagem_principal.imagem.url }}" class="img-fluid w-100 rounded-4 mb-3" alt="{{ produto.nome }}">
-      {% else %}
-        <div class="rounded-4 bg-light d-flex align-items-center justify-content-center text-secondary" style="min-height: 300px;">Imagem em breve</div>
-      {% endif %}
+      {% with imagens=produto.imagens.all %}
+        {% for img in imagens %}
+          {% if forloop.first %}
+            <img src="{{ img.imagem.url }}"
+                class="img-fluid w-70 rounded-4 mb-3"
+                alt="{{ produto.nome }}">
+          {% endif %}
+        {% empty %}
+          <div class="rounded-4 bg-light d-flex align-items-center justify-content-center text-secondary"
+              style="min-height: 300px;">
+            Imagem em breve
+          </div>
+        {% endfor %}
+      {% endwith %}
+
       <div class="row g-2">
         {% for img in produto.imagens.all %}
           {% if not img.principal %}
